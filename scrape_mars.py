@@ -94,7 +94,6 @@ def scrape_all():
 	img_urls = scrape_hemisphere(browser)
 	
 	mars_info = {
-		'news_date': 'date',
 		'news_headline': 'title',
 		'news_teaser': 'teaser',
 		'mars_image': scrape_image(browser),

@@ -4,7 +4,12 @@ from bs4 import BeautifulSoup
 from splinter import Browser
 from webdriver_manager.chrome import ChromeDriverManager
 
-def scrape_news(browser):
+
+def scrape_mars():
+	executable_path = {"executable_path": ChromeDriverManager().install()}
+	browser = Browser("chrome", **executable_path, headless=False)
+
+	# Scrape Mars news
 	news_url = 'https://redplanetscience.com'
 	browser.visit(news_url)
 
@@ -13,13 +18,10 @@ def scrape_news(browser):
 	news_html = browser.html
 	news_soup = BeautifulSoup(news_html, 'html.parser')
 
-	date = news_soup.find('div', {'class': 'list_date'}).text
-	title = news_soup.find('div', {'class': 'content_title'}).text
+	headline = news_soup.find('div', {'class': 'content_title'}).text
 	teaser = news_soup.find('div', {'class': 'article_teaser_body'}).text
 
-	return date, title, teaser
-
-def scrape_image(browser):
+	# Scrape Mars images
 	images_url = 'https://spaceimages-mars.com'
 	browser.visit(images_url)
 
@@ -30,26 +32,21 @@ def scrape_image(browser):
 
 	images_path = images_soup.find('img', {'class': 'headerimage fade-in'}).get('src')
 	featured_image_url = f'{images_url}/{images_path}'
-	
-	return featured_image_url
+	featured_image_alt = images_soup.find('h1', {'class': 'media_feature_title'}).text
 
-def scrape_facts(browser):
+	# Scrape Mars facts
 	facts_url = 'https://galaxyfacts-mars.com'
 	browser.visit(facts_url)
 
 	time.sleep(1)
 
 	tables = pd.read_html(facts_url)
-	tables
-
 	mars_facts_df = tables[0]
 	mars_facts_df.columns = mars_facts_df.iloc[0]
 	mars_facts_df = mars_facts_df.iloc[1:].reset_index(drop=True)
-	mars_facts_df
+	mars_html = mars_facts_df.to_html(index=False, index_names=False)
 
-	return mars_facts_df.to_html(index=False, index_names=False, classes='table table-striped')
-
-def scrape_hemisphere(browser):
+	# Scrape Mars hemispheres
 	hemisphere_url = 'https://marshemispheres.com'
 	browser.visit(hemisphere_url)
 
@@ -83,27 +80,17 @@ def scrape_hemisphere(browser):
 		hemisphere_dict['img_url'] = abs_path
 	
 		hemisphere_images.append(hemisphere_dict)
-
-	return hemisphere_images
-
-def scrape_all():
-	executable_path = {"executable_path": ChromeDriverManager().install()}
-	browser = Browser("chrome", **executable_path, headless=False)
-
-	news_date, news_headline, news_teaser = mars_news(browser)
-	img_urls = scrape_hemisphere(browser)
 	
 	mars_info = {
-		'news_headline': 'title',
-		'news_teaser': 'teaser',
-		'mars_image': scrape_image(browser),
-		'mars_facts': scrape_facts(),
-		'mars_hemispheres': img_urls	
+		'news_headline': headline,
+		'news_teaser': teaser,
+		'mars_image': featured_image_url,
+		'mars_alt': featured_image_alt,
+		'mars_facts': mars_html,
+		'mars_hemisphere': hemisphere_images
 	}
 
-	browser.quit()
+	browers.quit()
 
 	return mars_info
-
-if __name__ == "__main__":
-	print(scrape_all())
+	

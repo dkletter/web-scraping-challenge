@@ -4,26 +4,6 @@ from bs4 import BeautifulSoup
 from splinter import Browser
 from webdriver_manager.chrome import ChromeDriverManager
 
-def scrape_all():
-	executable_path = {"executable_path": ChromeDriverManager().install()}
-	browser = Browser("chrome", **executable_path, headless=False)
-
-	news_date, news_headline, news_teaser = mars_news(browser)
-	img_urls = scrape_hemisphere(browser)
-	
-	mars_info = {
-		'news_date': 'date',
-		'news_headline': 'title',
-		'news_teaser': 'teaser',
-		'mars_image': scrape_image(browser),
-		'mars_facts': scrape_facts(),
-		'mars_hemispheres': img_urls	
-	}
-
-	browser.quit()
-
-	return.mars_info
-
 def scrape_news(browser):
 	news_url = 'https://redplanetscience.com'
 	browser.visit(news_url)
@@ -67,7 +47,7 @@ def scrape_facts(browser):
 	mars_facts_df = mars_facts_df.iloc[1:].reset_index(drop=True)
 	mars_facts_df
 
-	return mars_facts_df.to_html('mars_facts.html', index=False, index_names=False, classes='table table-striped')
+	return mars_facts_df.to_html(index=False, index_names=False, classes='table table-striped')
 
 def scrape_hemisphere(browser):
 	hemisphere_url = 'https://marshemispheres.com'
@@ -105,6 +85,26 @@ def scrape_hemisphere(browser):
 		hemisphere_images.append(hemisphere_dict)
 
 	return hemisphere_images
+
+def scrape_all():
+	executable_path = {"executable_path": ChromeDriverManager().install()}
+	browser = Browser("chrome", **executable_path, headless=False)
+
+	news_date, news_headline, news_teaser = mars_news(browser)
+	img_urls = scrape_hemisphere(browser)
+	
+	mars_info = {
+		'news_date': 'date',
+		'news_headline': 'title',
+		'news_teaser': 'teaser',
+		'mars_image': scrape_image(browser),
+		'mars_facts': scrape_facts(),
+		'mars_hemispheres': img_urls	
+	}
+
+	browser.quit()
+
+	return mars_info
 
 if __name__ == "__main__":
 	print(scrape_all())

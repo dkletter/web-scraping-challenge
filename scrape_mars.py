@@ -7,7 +7,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 def scrape_mars():
 	executable_path = {"executable_path": ChromeDriverManager().install()}
-	browser = Browser("chrome", **executable_path, headless=False)
+	browser = Browser("chrome", **executable_path, headless=True)
 
 	# Scrape Mars news
 	news_url = 'https://redplanetscience.com'
@@ -90,7 +90,7 @@ def scrape_mars():
 		'mars_hemisphere': hemisphere_images
 	}
 
-	browers.quit()
+	browser.quit()
 
 	return mars_info
 	
